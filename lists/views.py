@@ -1,25 +1,32 @@
 from django.shortcuts import render,redirect
 from django.http import HttpResponse
-from lists.models import Item
+from lists.models import Item,List
 
 # Create your views here.
 def home_page(request):
-		
-	#	return HttpResponse(request.POST['item_text'])
-	#item = Item()
-	#item.text = request.POST.get('item_text','')
-	#item.save()
 
-	if request.method == 'POST':
-		#new_item_text = request.POST['item_text']
-		Item.objects.create(text=request.POST['item_text'])
-		return redirect('/')
-	
-		
-	items = Item.objects.all()
-	
-	return render(request, 'home.html',{
-		'items':items
-		})
+	return render(request, 'home.html')
 	#return HttpResponse('<html><title>To-Do lists</title></html>')
 #home_page = None
+
+def view_list(request,list_id):
+	list_ = List.objects.get(id=list_id)
+	#items = Item.objects.filter(list=list_)
+	#items = Item.objects.all()
+	
+	return render(request, 'list.html',{
+		'list':list_
+		})
+		
+
+def new_list(request):
+    list_ = List.objects.create()
+    Item.objects.create(text=request.POST['item_text'], list=list_)
+    return redirect('/lists/%d/' % (list_.id,))
+
+	
+	
+def add_item(request,list_id):
+	list_ = List.objects.get(id=list_id)
+	Item.objects.create(text=request.POST['item_text'],list=list_)
+	return redirect('/lists/%d/'%(list_.id,))
